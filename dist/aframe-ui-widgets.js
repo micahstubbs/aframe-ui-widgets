@@ -70073,7 +70073,17 @@
 	    el.addEventListener('touchup', this.onButtonUp.bind(this));
 	  },
 
-	  onButtonDown: function() {
+	  pause: function () {
+	    var el = this.el;
+	    el.removeEventListener('mousedown', this.onButtonDown.bind(this));
+	    el.removeEventListener('mouseup', this.onButtonUp.bind(this));
+	    el.removeEventListener('mouseleave', this.onButtonUp.bind(this));
+	    el.removeEventListener('hit', this.onHit);
+	    el.removeEventListener('touchdown', this.onButtonDown.bind(this));
+	    el.removeEventListener('touchup', this.onButtonUp.bind(this));
+	  },
+
+	  onButtonDown: function () {
 	    var top = this.top;
 	    var el = this.el;
 	    top.position.y = this.data.topY - this.data.topDepressY;
@@ -70081,7 +70091,7 @@
 	    el.emit('buttondown');
 	  },
 
-	  onButtonUp: function() {
+	  onButtonUp: function () {
 	    var top = this.top;
 	    var el = this.el;
 	    top.position.y = this.data.topY;
@@ -70110,7 +70120,7 @@
 	    this.lastTime = performance.now();
 	  },
 
-	  update: function() {
+	  update: function () {
 	    this.el.setAttribute('cursor-listener','');
 	  },
 
@@ -70153,27 +70163,32 @@
 	    this.el.setObject3D('mesh', chassis);
 
 	    this.value = this.data.value;
-	  },
 
-	  play: function () {
-	    var self = this;
-	    var el = this.el;
-	    var controllers = Array.prototype.slice.call(document.querySelectorAll('a-entity[hand-controls]'));
-	    self.grabbed = false;
-
-	    el.addEventListener('rangeout', this.onTriggerUp.bind(this));
-
-	    controllers.forEach(function(controller){
-	      controller.addEventListener('triggerdown', this.onTriggerDown.bind(this));
-	      controller.addEventListener('triggerup', this.onTriggerUp.bind(this));
-	    }.bind(this));
-
-	    el.addEventListener('click', this.toggleValue.bind(this));
+	    this.controllers = Array.prototype.slice.call(document.querySelectorAll('a-entity[hand-controls]'));
 
 	    this.setValue(this.data.value);
 	  },
 
-	  onTriggerDown: function(e) {
+	  play: function () {
+	    this.grabbed = false;
+	    this.el.addEventListener('rangeout', this.onTriggerUp.bind(this));
+	    this.controllers.forEach(function (controller){
+	      controller.addEventListener('triggerdown', this.onTriggerDown.bind(this));
+	      controller.addEventListener('triggerup', this.onTriggerUp.bind(this));
+	    }.bind(this));
+	    this.el.addEventListener('click', this.toggleValue.bind(this));
+	  },
+
+	  pause: function () {
+	    this.el.removeEventListener('rangeout', this.onTriggerUp.bind(this));
+	    this.controllers.forEach(function (controller){
+	      controller.removeEventListener('triggerdown', this.onTriggerDown.bind(this));
+	      controller.removeEventListener('triggerup', this.onTriggerUp.bind(this));
+	    }.bind(this));
+	    this.el.removeEventListener('click', this.toggleValue.bind(this));
+	  },
+
+	  onTriggerDown: function (e) {
 	    var hand = e.target.object3D;
 	    var lever = this.lever;
 
@@ -70187,14 +70202,14 @@
 	    };
 	  },
 
-	  onTriggerUp: function() {
+	  onTriggerUp: function () {
 	    if (this.grabbed) {
 	      this.grabbed.visible = true;
 	      this.grabbed = false;
 	    }
 	  },
 
-	  setValue: function(value) {
+	  setValue: function (value) {
 	    this.lever.position.z = (value) ? -0.08 : 0.08;
 	    if (this.value !== value) {
 	      this.el.emit('change', { value: value });
@@ -70202,12 +70217,12 @@
 	    }
 	  },
 
-	  toggleValue: function() {
+	  toggleValue: function () {
 	    var value = this.value ? 0 : 1;
 	    this.setValue(value);
 	  },
 
-	  tick: function() {
+	  tick: function () {
 	    var axis = 'z';
 	    var hand = this.grabbed;
 	    var lever = this.lever;
@@ -70259,22 +70274,27 @@
 	    chassis.add(lever);
 
 	    this.el.setObject3D('mesh', chassis);
+
+	    this.controllers = Array.prototype.slice.call(document.querySelectorAll('a-entity[hand-controls]'));
+
+	    this.setValue(this.data.value);
 	  },
 
 	  play: function () {
-	    var self = this;
-	    var el = this.el;
-	    var controllers = Array.prototype.slice.call(document.querySelectorAll('a-entity[hand-controls]'));
-	    self.grabbed = false;
-
-	    el.addEventListener('rangeout', this.onTriggerUp.bind(this));
-
-	    controllers.forEach(function(controller){
+	    this.grabbed = false;
+	    this.el.addEventListener('rangeout', this.onTriggerUp.bind(this));
+	    this.controllers.forEach(function (controller){
 	      controller.addEventListener('triggerdown', this.onTriggerDown.bind(this));
 	      controller.addEventListener('triggerup', this.onTriggerUp.bind(this));
 	    }.bind(this));
+	  },
 
-	    this.setValue(this.data.value);
+	  pause: function () {
+	    this.el.removeEventListener('rangeout', this.onTriggerUp.bind(this));
+	    this.controllers.forEach(function (controller){
+	      controller.removeEventListener('triggerdown', this.onTriggerDown.bind(this));
+	      controller.removeEventListener('triggerup', this.onTriggerUp.bind(this));
+	    }.bind(this));
 	  },
 
 	  onTriggerDown: function(e) {
@@ -70361,29 +70381,33 @@
 	    body.add(knob);
 
 	    this.el.setObject3D('mesh', body);
+
+	    this.controllers = Array.prototype.slice.call(document.querySelectorAll('a-entity[hand-controls]'));
 	  },
 
-
-
 	  play: function () {
-	    var self = this;
-	    var controllers = Array.prototype.slice.call(document.querySelectorAll('a-entity[hand-controls]'));
-	    self.grabbed = false;
-
-	    controllers.forEach(function(controller){
+	    this.grabbed = false;
+	    this.controllers.forEach(function (controller) {
 	      controller.addEventListener('triggerdown', this.onTriggerDown.bind(this));
 	      controller.addEventListener('triggerup', this.onTriggerUp.bind(this));
 	    }.bind(this));
 	  },
 
-	  onTriggerUp: function() {
+	  pause: function () {
+	    this.controllers.forEach(function (controller) {
+	      controller.removeEventListener('triggerdown', this.onTriggerDown.bind(this));
+	      controller.removeEventListener('triggerup', this.onTriggerUp.bind(this));
+	    }.bind(this));
+	  },
+
+	  onTriggerUp: function () {
 	    if (this.grabbed) {
 	      this.grabbed.visible = true;
 	      this.grabbed = false;
 	    }
 	  },
 
-	  onTriggerDown: function(e) {
+	  onTriggerDown: function (e) {
 	    var hand = e.target.object3D;
 	    var knob = this.knob;
 
