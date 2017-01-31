@@ -2,6 +2,7 @@
   <head>
     <title>A-Frame UI Widgets</title>
     <script src="../build.js"></script>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   </head>
   <body>
     <a-scene>
@@ -14,9 +15,9 @@
       <!-- UI widgets -->
       <a-entity position="0 1 0" rotation="0 0 0">
         <a-entity id="target"
-          position="0 0.5 -1.5"
-          geometry="primitive: torusKnot; radius: 0.5; radiusTubular: 0.02; p: 3; q: 2"
-          material="color: orange">
+          position="-0.5 0.5 -1.5"
+          geometry="primitive: box; width: 0.2; height: 0.75; depth: 0.2"
+          material="color: #FFDF00">
         </a-entity>
 
         <!-- Rotary Knob -->
@@ -39,16 +40,22 @@
     button.addEventListener('pressed', function() {
       var randomHexColor = Math.floor(Math.random() * 0xffffff).toString(16);
       targetEntity.setAttribute('material', {
-        color: '#' + randomHexColor
+        color: '#' + 'FFDF00' // randomHexColor
       });
     });
 
-    // changes tubular radius
+    console.log('targetEntity position', targetEntity.getAttribute('position'));
+
+    // changes bar height
     var rotaryKnob = document.querySelector('#rotaryKnobLeft');
     rotaryKnob.addEventListener('change', function(e) {
-      var value = e.detail.value * 0.01;
+      var value = e.detail.value * 0.1;
+      // console.log('scaled value from rotary knob', value);
       targetEntity.setAttribute('geometry', {
-        radiusTubular: targetEntity.getAttribute('geometry').radiusTubular + value
+        height: targetEntity.getAttribute('geometry').height + value
+      });
+      targetEntity.setAttribute('position', {
+        y: 0.5
       });
     });
     </script>
