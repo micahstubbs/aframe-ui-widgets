@@ -14,9 +14,20 @@
 
       <!-- UI widgets -->
       <a-entity position="0 1 0" rotation="0 0 0">
-        <a-entity id="target"
+        <!-- Bars -->
+        <a-entity id="targetLeft"
           position="-0.5 0.5 -1.5"
-          geometry="primitive: box; width: 0.2; height: 0.75; depth: 0.2"
+          geometry="primitive: box; width: 0.2; height: 1.2; depth: 0.2"
+          material="color: #FFDF00">
+        </a-entity>
+        <a-entity id="targetMiddle"
+          position="0 0.5 -1.5"
+          geometry="primitive: box; width: 0.2; height: 0.5; depth: 0.2"
+          material="color: #FFDF00">
+        </a-entity>
+        <a-entity id="targetRight"
+          position="0.5 0.5 -1.5"
+          geometry="primitive: box; width: 0.2; height: 0.2; depth: 0.2"
           material="color: #FFDF00">
         </a-entity>
 
@@ -26,38 +37,49 @@
         <a-entity id="rotaryKnobRight" ui-rotary position="0.35 0.1 -0.3" rotation="45 0 0"></a-entity>
 
         <!-- Button -->
-        <a-entity id="button" ui-button="color:#4eba5e" position="0.7 0.1 -0.3" rotation="45 0 0"></a-entity>
+        <a-entity id="button" ui-button="color:#4eba5e; pressedColor:#FFDF00" position="0.7 0.1 -0.3" rotation="45 0 0"></a-entity>
+
+        <!-- Box to hide bottom half of bars -->
+        <!-- an ugly hack that works quite nicely -->
+        <a-box position='0.3 0 -1.5' width='2.5' height='1' depth='0.5' color='#333333' opacity='1'></a-box>
 
       </a-entity>
     </a-scene>
 
     <script>
-    // Object which we're going to modify
-    var targetEntity = document.querySelector('#target');
+    function linkControlToBar(ordinalPosition) { // `Left`, `Middle`, or `Right`, case sensitive
+      // Object which we're going to modify
+      var targetEntity = document.querySelector('#target' + ordinalPosition);
+      console.log('targetEntity', targetEntity);
 
-    // picks random color
-    var button = document.querySelector('#button');
-    button.addEventListener('pressed', function() {
-      var randomHexColor = Math.floor(Math.random() * 0xffffff).toString(16);
-      targetEntity.setAttribute('material', {
-        color: '#' + 'FFDF00' // randomHexColor
+      // picks random color
+      var button = document.querySelector('#button');
+      button.addEventListener('pressed', function() {
+        var randomHexColor = Math.floor(Math.random() * 0xffffff).toString(16);
+        targetEntity.setAttribute('material', {
+          color: '#' + 'FFDF00' // randomHexColor
+        });
       });
-    });
 
-    console.log('targetEntity position', targetEntity.getAttribute('position'));
+      console.log('targetEntity position', targetEntity.getAttribute('position'));
 
-    // changes bar height
-    var rotaryKnob = document.querySelector('#rotaryKnobLeft');
-    rotaryKnob.addEventListener('change', function(e) {
-      var value = e.detail.value * 0.1;
-      // console.log('scaled value from rotary knob', value);
-      targetEntity.setAttribute('geometry', {
-        height: targetEntity.getAttribute('geometry').height + value
+      // changes bar height
+      var rotaryKnob = document.querySelector('#rotaryKnob' + ordinalPosition);
+      rotaryKnob.addEventListener('change', function(e) {
+        var value = e.detail.value * 0.1;
+        // console.log('scaled value from rotary knob', value);
+        targetEntity.setAttribute('geometry', {
+          height: targetEntity.getAttribute('geometry').height + value
+        });
+        targetEntity.getObject3D('mesh').geometry.translate(0, height / 2, 0);
+        // targetEntity.setAttribute('position', {
+        //   y: targetEntity.getAttribute('geometry').y + (value / 2)
+        // });
       });
-      targetEntity.setAttribute('position', {
-        y: 0.5
-      });
-    });
+    }
+    linkControlToBar('Left');
+    linkControlToBar('Middle');
+    linkControlToBar('Right');
     </script>
 
     <!-- GitHub Corner. -->
